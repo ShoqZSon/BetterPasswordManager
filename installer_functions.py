@@ -1,62 +1,23 @@
+import validateLocation as VL
+import validateUserInput as VU
+import utilities as util
 import os
-import shutil
-import platform
 
-MAX_INPUT_LENGTH = 500
-
-"""
-Checks if input is empty
-:arg 
-inputString (str): Path of the location where the application is supposed to be installed
-:returns 
-bool: True if input is empty, False otherwise
-"""
-def inputEmpty(inputString: str) -> bool:
-    return len(inputString) == 0
-
-"""
-"""
-def invalidChars(inputString: str, forbiddenChars: str) -> bool:
-    return any(char in forbiddenChars for char in inputString)
-
-"""
-"""
-def getOS() -> str:
-    return platform.system()
-
-"""
-"""
-# check for 50mb of available space
-def checkSpace(location: str) -> bool:
-    required_space = 50 * 1024 * 1024
-
-    try:
-        total, used, free = shutil.disk_usage(location)
-        return free < required_space
-    except OSError as e:
-        print(f"Error checking space at {location}: {e}")
-        return False
-
-"""
-Validates the user input by checking if the input was empty, too long (>200 chars) or if there were any forbidden characters used.
-
-:returns the location of the installation as a string
-"""
-def validateUserInput() -> str:
-    install_path = input("Please enter the installation path: ")
-
-    if inputEmpty(install_path):
-        raise ValueError("Input == 0")
-    elif len(install_path) > MAX_INPUT_LENGTH:
-        raise ValueError("Input too large")
-
-    forbiddenChars = r'<>"|?*!§$&°^`´'
-    if invalidChars(install_path, forbiddenChars):
-        raise ValueError("Invalid input")
-
-    return install_path
 
 def validateLocation(location: str) -> bool:
+    """
+        Validates the given location with the following checks:
+            - Does the given path exist?
+            - Is the path a directory?
+            - Does the user have permission to access the directory?
+            - Does the disk have enough space (at least 50MB)?
+
+        :param location: The location where the application is supposed to be installed.
+        :type location: str
+        :return: True if every check is successful, False otherwise.
+        :rtype: bool
+    """
+
     if not os.path.exists(location):
         print("Path does not exist")
         return False
@@ -69,8 +30,29 @@ def validateLocation(location: str) -> bool:
         print("Path is not writable")
         return False
 
-    if checkSpace(location):
+    if VL.checkSpace(location):
         print("Disk has not enough space left")
         return False
 
     return True
+
+def validateUserInput() -> str:
+    """
+        Validates the user input by checking if the input is empty, too long (>200 chars), or contains any forbidden characters.
+
+        :return: The location of the installation as a string.
+        :rtype: str
+    """
+
+    install_path = input("Please enter the installation path: ")
+
+    if util.inputEmpty(install_path):
+        raise ValueError("Input == 0")
+    elif len(install_path) > VU.MAX_INPUT_LENGTH:
+        raise ValueError("Input too large")
+
+    forbiddenChars = r'<>"|?*!§$&°^`´'
+    if VU.invalidChars(install_path, forbiddenChars):
+        raise ValueError("Invalid input")
+
+    return install_path
