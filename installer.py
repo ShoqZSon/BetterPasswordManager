@@ -97,27 +97,8 @@ class MainWindow(QMainWindow):
             self.start_progress()
             # creates the base folder for the application files
             directory = util.createFolder(self.lE_install_path.text(), self.lE_install_folder.text())
-            util.createFile(directory, "config.json")
-            self.progress += 20
-            self.update_progress()
-            util.createFile(directory, "key.key")
-            self.progress += 20
-            self.update_progress()
 
-            util.createFile(directory, "database.txt")
-            self.progress += 20
-            self.update_progress()
 
-            util.createFile(directory, "usernames.txt")
-            self.progress += 20
-            self.update_progress()
-
-            util.createFile(directory, "passwords.txt")
-            self.progress += 20
-            self.update_progress()
-
-            # do more here
-            # ...
 
             self.close()
 
