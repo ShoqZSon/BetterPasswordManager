@@ -10,7 +10,7 @@ def validateUserInput() -> str:
         Validates the user input by checking if the input is empty, too long (>200 chars), or contains any forbidden characters.
 
         :return: The location of the installation as a string.
-        :rtype: str
+        :return: str
     """
 
     install_path = input("Please enter the absolute installation path: ")
@@ -37,7 +37,6 @@ def validateLocation(location: str) -> bool:
         :param location: The location where the application is supposed to be installed.
         :type location: str
         :return: True if every check is successful, False otherwise.
-        :rtype: bool
     """
 
     if not os.path.exists(location):

@@ -1,4 +1,5 @@
 import os
+from PySide6.QtWidgets import QMessageBox
 
 def inputEmpty(inputString: str) -> bool:
     """
@@ -25,8 +26,6 @@ def createFolder(location: str, folderName: str) -> str:
     """
 
     directory = os.path.join(location, folderName)
-    if os.path.exists(directory):
-        raise FileExistsError (f"{folderName} already exists")
 
     os.makedirs(directory, mode=0o700, exist_ok=True)
     print(f"Directory '{folderName}' created at: {location}")
@@ -51,7 +50,15 @@ def createFile(location: str, fileName: str) -> bool:
     with open(file, "w") as f:
         f.write('')
 
-    print(f"Directory '{fileName}' created at: {location}")
+    print(f"File '{fileName}' created at: {location}")
 
     return True
 
+def show_notification(text):
+    # Create a QMessageBox
+    msg_box = QMessageBox()
+    msg_box.setIcon(QMessageBox.Information)
+    msg_box.setText(text)
+    msg_box.setWindowTitle("Error!")
+    msg_box.setStandardButtons(QMessageBox.Ok)
+    msg_box.exec()
