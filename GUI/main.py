@@ -1,7 +1,7 @@
 import sys
 from PySide6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget
-from login_gui import Login
-from entry_gui import NewEntry
+from GUI.login_gui import Login
+from GUI.entry_gui import NewEntry
 
 
 class MainWindow(QMainWindow):

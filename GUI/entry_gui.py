@@ -1,7 +1,7 @@
-from PySide6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QPushButton, QLineEdit, QLabel, \
+from PySide6.QtWidgets import QMainWindow, QVBoxLayout, QWidget, QPushButton, QLineEdit, QLabel, \
     QComboBox, QHBoxLayout
-from PySide6.QtCore import QTimer, Qt
-from utilities import show_notification
+from PySide6.QtCore import QTimer
+from installer.utilities import show_notification
 
 
 class NewEntry(QMainWindow):

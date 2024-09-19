@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import QMainWindow, QVBoxLayout, QWidget, QPushButton, QLineEdit, QLabel
 from PySide6.QtCore import Qt
-from setupDB import DatabasePSQL
-from utilities import show_notification
+from installer.setupDB import DatabasePSQL
+from installer.utilities import show_notification
 
 class Login(QMainWindow):
     def __init__(self, main_window):

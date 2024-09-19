@@ -158,6 +158,13 @@ class MainWindow(QMainWindow):
             # creates the base folder for the application files
             directory = util.createFolder(self.lE_install_path.text(), self.lE_install_folder.text())
 
+            config = 'config.json'
+            util.createFile(directory,config)
+            data = {
+                'setup_done': False
+            }
+            util.writeJson(directory,config,data)
+
             user_db = 'pwm_' + self.lE_username.text()
             db = DatabasePSQL(self.lE_username.text(),self.lE_password.text(),user_db)
 

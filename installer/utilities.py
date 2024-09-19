@@ -1,17 +1,6 @@
 import os
+import json
 from PySide6.QtWidgets import QMessageBox
-
-def inputEmpty(inputString: str) -> bool:
-    """
-        Checks if the input string is empty.
-
-        :param inputString: The string to check.
-        :type inputString: str
-        :return: True if the input string is empty, False otherwise.
-        :rtype: bool
-    """
-
-    return len(inputString) == 0
 
 def createFolder(location: str, folderName: str) -> str:
     """
@@ -53,6 +42,35 @@ def createFile(location: str, fileName: str) -> bool:
     print(f"File '{fileName}' created at: {location}")
 
     return True
+
+def writeJson(location: str, fileName: str, data) -> bool:
+    """Writes data to a JSON file.
+
+    Args:
+        location (str): The directory where the JSON file will be saved.
+        fileName (str): The name of the JSON file (should end with .json).
+        data: The data to write to the JSON file (must be serializable).
+
+    Returns:
+        bool: True if the file was written successfully, False otherwise.
+    """
+    try:
+        # Ensure the directory exists
+        os.makedirs(location, exist_ok=True)
+
+        # Create the full file path
+        file_path = os.path.join(location, fileName)
+
+        # Write the data to the JSON file
+        with open(file_path, 'w') as json_file:
+            json.dump(data, json_file, indent=4)
+
+        return True
+    except Exception as e:
+        print(f"Error writing JSON file: {e}")
+        return False
+
+
 
 def show_notification(text):
     # Create a QMessageBox
