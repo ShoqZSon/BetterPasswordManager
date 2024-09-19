@@ -5,8 +5,9 @@ from PySide6.QtCore import QTimer
 import validateLocation as VL
 import validateUserInput as VU
 import os
+from cryptography.fernet import Fernet
 
-from setupDB import DatabasePSQL
+from database import DatabasePSQL
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -177,6 +178,11 @@ class MainWindow(QMainWindow):
             db.connect(user_db,self.lE_username.text(),self.lE_password.text())
 
             db.createPasswordsTable()
+
+            db.createKeysTable()
+
+            key = Fernet.generate_key() # creates initial key
+            db.createEntryKeysTable(key)
 
             db.disconnect()
 

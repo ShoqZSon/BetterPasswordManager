@@ -2,13 +2,15 @@ from PySide6.QtWidgets import QMainWindow, QVBoxLayout, QWidget, QPushButton, QL
     QComboBox, QHBoxLayout
 from PySide6.QtCore import QTimer
 from installer.utilities import show_notification
-
+from installer.database import DatabasePSQL
+from installer.crypto import Crypto
 
 class NewEntry(QMainWindow):
-    def __init__(self):
+    def __init__(self,db_connection:DatabasePSQL):
         super().__init__()
 
         self.i = 0
+        self.db = db_connection
 
         widget = QWidget()
         main_layout = QVBoxLayout(widget)
@@ -34,7 +36,7 @@ class NewEntry(QMainWindow):
         self.b_randomize.clicked.connect(self.randomizePassword)
 
         self.b_send = QPushButton("Done", self)
-        self.b_send.clicked.connect(self.checkFields)
+        self.b_send.clicked.connect(self.send)
 
         main_layout.addWidget(self.l_designation)
         main_layout.addWidget(self.lE_designation)
@@ -48,12 +50,38 @@ class NewEntry(QMainWindow):
 
         main_layout.addWidget(self.b_send)
 
+    def send(self):
+        print("send")
+        if self.checkFields():
+            print("encrypting")
+            crypto = Crypto(self.lE_type_input.text())
+            key = self.db.retrieveKey()
+            crypto.setKey(key)
+
+            crypto.createCipherSuite()
+
+            password_encrypted = crypto.encrypt()
+
+            self.db.createEntryPWTable(password_encrypted)
+
+            password_encrypted = self.db.retrievePassword()
+            password_decrypted = crypto.decrypt(password_encrypted)
+            print(password_decrypted.decode('utf-8'))
+
+
     def checkFields(self):
-        if self.lE_designation.text() == "":
+        print("checkFields")
+        if not self.lE_designation.text():
             self.lE_designation.setPlaceholderText("Cannot be left blank!")
             show_notification("The designation has been left blank!")
+
+            return False
         if self.dD_type.currentText() == "Auswahl":
             show_notification("No type has been chosen!")
+
+            return False
+
+        return True
 
     def showClearPassword(self):
         self.lE_type_input.setEchoMode(QLineEdit.Normal)

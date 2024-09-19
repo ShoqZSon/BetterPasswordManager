@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import QMainWindow, QVBoxLayout, QWidget, QPushButton, QLineEdit, QLabel
 from PySide6.QtCore import Qt
-from installer.setupDB import DatabasePSQL
+from installer.database import DatabasePSQL
 from installer.utilities import show_notification
 
 class Login(QMainWindow):
@@ -44,6 +44,6 @@ class Login(QMainWindow):
         connected = db.connect(db.get_new_db(),db.get_new_user(),db.get_new_password())
         if connected:
             show_notification("Successfully logged in!")
-            self.main_window.set_current_page(1)
+            self.main_window.set_current_page(1,db)
         else:
             show_notification("Invalid username or password!")

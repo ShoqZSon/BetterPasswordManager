@@ -6,12 +6,10 @@ def createFolder(location: str, folderName: str) -> str:
     """
         Creates a directory at the specified path.
 
-        :param location: The path where the directory should be created.
-        :type location: str
-        :param folderName: The name of the folder to create.
-        :type folderName: str
+        :param: str - location: The path where the directory should be created.
+        :param: str - folderName: The name of the folder to create.
         :raises FileExistsError: If the folder already exists.
-        :return: The created folder on success.
+        :return: str - The created folder on success.
     """
 
     directory = os.path.join(location, folderName)
@@ -24,11 +22,9 @@ def createFolder(location: str, folderName: str) -> str:
 def createFile(location: str, fileName: str) -> bool:
     """
     Creates a file at the specified path.
-    :param location: The path where the file should be created.
-    :type location: str
-    :param fileName: Name of the file to create.
-    :type fileName: str
-    :returns True if the file was created, False otherwise.
+    :param str - location: The path where the file should be created.
+    :param str - fileName: Name of the file to create.
+    :return True if the file was created, False otherwise.
     """
 
     file = os.path.join(location, fileName)
@@ -69,8 +65,6 @@ def writeJson(location: str, fileName: str, data) -> bool:
     except Exception as e:
         print(f"Error writing JSON file: {e}")
         return False
-
-
 
 def show_notification(text):
     # Create a QMessageBox
