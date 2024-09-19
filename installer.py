@@ -1,17 +1,20 @@
 import utilities as util
 import sys
-from PySide6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QPushButton, QLineEdit, QLabel, QHBoxLayout, QTextEdit, QProgressBar
+from PySide6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QPushButton, QLineEdit, QLabel, QTextEdit, QProgressBar
 from PySide6.QtCore import QTimer
 import validateLocation as VL
 import validateUserInput as VU
 import os
 
+from setupDB import DatabasePSQL
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
         self.progress = 0
+        self.invalidChars_sql = ["'", '"', ';', '--', '/*', '*/', '(', ')', '=', '<', '>', '|', '~']
 
+        self.invalidChars = ['<','>','"','?','°','`','´']
         widget = QWidget()
         main_layout = QVBoxLayout(widget)
         self.setCentralWidget(widget)
@@ -30,6 +33,25 @@ class MainWindow(QMainWindow):
         self.lE_install_folder = QLineEdit()
         self.lE_install_folder.setPlaceholderText("MyPasswortManager")
 
+        self.l_username = QLabel("Enter your username:")
+        self.tE_username = QTextEdit()
+        self.tE_username.setReadOnly(True)
+        self.tE_username.setText("Rules:"
+                                 "Between 5 and 25 characters (inclusive)."
+                                 f"Invalid chars: {self.invalidChars}.")
+        self.lE_username = QLineEdit()
+        self.lE_username.setPlaceholderText("username")
+
+        self.l_password = QLabel("Enter your master password:")
+        self.tE_password = QTextEdit()
+        self.tE_password.setReadOnly(True)
+        self.tE_password.setText("Rules:"
+                                 "Between 10 and 30 characters (inclusive)."
+                                 f"Invalid chars: {self.invalidChars}.")
+        self.lE_password = QLineEdit()
+        self.lE_password.setPlaceholderText("master password")
+        self.lE_password.setEchoMode(QLineEdit.PasswordEchoOnEdit)
+
         self.b_install = QPushButton("Install", self)
         self.b_install.clicked.connect(self.install)
 
@@ -44,24 +66,30 @@ class MainWindow(QMainWindow):
         main_layout.addWidget(self.lE_install_path)
         main_layout.addWidget(self.l_install_folder)
         main_layout.addWidget(self.lE_install_folder)
+        main_layout.addWidget(self.l_username)
+        main_layout.addWidget(self.lE_username)
+        main_layout.addWidget(self.l_password)
+        main_layout.addWidget(self.lE_password)
         main_layout.addWidget(self.b_install)
         main_layout.addWidget(self.progress_bar)
 
 
-
     def validation(self):
-        return self.validateUserInput() and self.validatePath() and self.validateFolder()
+        if self.validateUserInput() and self.validatePath() and self.validateFolder():
+            if self.validateUsername() and self.validatePassword():
+                return True
+
+        return False
+
 
     def validateUserInput(self) -> bool:
-        forbiddenChars = r'<>"|?*!§$&°^`´'
-
         if not self.lE_install_path.text():
             util.show_notification("The installation path is empty!")
             return False
         elif len(self.lE_install_path.text()) > VU.MAX_INPUT_LENGTH:
             util.show_notification("The installation path is too long!")
             return False
-        elif VU.invalidChars(self.lE_install_path.text(), forbiddenChars):
+        elif VU.invalidChars(self.lE_install_path.text(), self.invalidChars_sql):
             util.show_notification("The installation path is invalid!")
             return False
         else:
@@ -83,10 +111,42 @@ class MainWindow(QMainWindow):
         else:
             return True
 
+    def validateUsername(self):
+        if not self.lE_username.text():
+            util.show_notification("The username is empty!")
+            return False
+        elif len(self.lE_username.text()) < 5:
+            util.show_notification("The username is too short!")
+            return False
+        elif len(self.lE_username.text()) > 25:
+            util.show_notification("The username is too long!")
+            return False
+        elif any(char in self.invalidChars for char in self.lE_username.text()):
+            util.show_notification("The username is invalid!")
+            return False
+        else:
+            return True
+
+    def validatePassword(self):
+        if not self.lE_password.text():
+            util.show_notification("The password is empty!")
+            return False
+        elif len(self.lE_password.text()) < 10:
+            util.show_notification("The password is too short!")
+            return False
+        elif len(self.lE_username.text()) > 30:
+            util.show_notification("The password is too long!")
+            return False
+        elif any(char in self.invalidChars for char in self.lE_username.text()):
+            util.show_notification("The password is invalid!")
+            return False
+        else:
+            return True
+
     def validateFolder(self) -> bool:
         folderPath = os.path.join(self.lE_install_path.text(), self.lE_install_folder.text())
         if os.path.exists(folderPath):
-            util.show_notification("The folder already exists!")
+            util.show_notification("The folder already exists. Choose a different one!")
             return False
 
         return True
@@ -98,7 +158,20 @@ class MainWindow(QMainWindow):
             # creates the base folder for the application files
             directory = util.createFolder(self.lE_install_path.text(), self.lE_install_folder.text())
 
+            user_db = 'pwm_' + self.lE_username.text()
+            db = DatabasePSQL(self.lE_username.text(),self.lE_password.text(),user_db)
 
+            db.connect(db.get_admin_dbname(),db.get_admin_user(),db.get_admin_password())
+
+            db.createDB()
+
+            db.createUser()
+
+            db.connect(user_db,self.lE_username.text(),self.lE_password.text())
+
+            db.createPasswordsTable()
+
+            db.disconnect()
 
             self.close()
 

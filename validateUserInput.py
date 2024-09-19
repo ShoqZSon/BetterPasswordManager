@@ -2,7 +2,7 @@ import platform
 
 MAX_INPUT_LENGTH = 500
 
-def invalidChars(inputString: str, forbiddenChars: str) -> bool:
+def invalidChars(inputString: str, forbiddenChars: list) -> bool:
     """
         Checks if there are any forbidden characters inside the given string.
 
